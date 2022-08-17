@@ -110,6 +110,7 @@ impl fmt::Display for Board {
             if (i+1) % 27 == 0 {
                 string_builder.push_str("---------------------\n"); 
             }
+
         }
 
         write!(f, "{}", string_builder)
