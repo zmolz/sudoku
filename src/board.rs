@@ -7,7 +7,6 @@ use rand::thread_rng;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fmt;
-use std::string;
 
 pub struct Board {
     /* we do not need a 2d matrix as the board,
@@ -46,8 +45,19 @@ impl Board {
         // find set difference between cell val options and the neighbors
         let mut options: Vec<CellVal> = cell_vals_diff(neighbors);
 
-        // DEBUG
+        // base-case 2
         if options.is_empty() {
+            /* 
+               if options is empty, we need to try another cellval
+               for the previous cell. to do this we must keep track of
+               cellvals we have not used for the previous cell, which will be 
+               options[1..]. So, we need an auxiliary function to help keep 
+               that vector unique to each frame. every time that the remaining
+               cellvals array is empty, we backtrack, try another value, take
+               a step, if options is empty again we backtrack yet again, and if
+               the cell now has 0 choice we backtrack two cells. etc.
+            */
+
             println!("{}", self);
             panic!("No Valid Options Left")
         }
@@ -62,13 +72,8 @@ impl Board {
         // add value
         self.cells.push_back(Cell::new(val, pos));
 
-
         // recursive step
-        let (i, j) = if j == 9 {
-            (i+1, 1)
-        } else {
-            (i, j+1)
-        };
+        let (i, j) = if j == 9 { (i + 1, 1) } else { (i, j + 1) };
 
         self.fill_cells(i, j)
     }
@@ -79,10 +84,7 @@ impl Board {
         for cell in &self.cells {
             let coord: &Coord = cell.pos();
 
-            if coord.row() == pos.row()
-                || coord.col() == pos.col()
-                || coord.grid() == pos.grid()
-            {
+            if coord.row() == pos.row() || coord.col() == pos.col() || coord.grid() == pos.grid() {
                 neighbors.insert(cell.val());
             }
         }
@@ -101,13 +103,13 @@ impl fmt::Display for Board {
 
         string_builder.push_str(line);
         for i in 0..self.cells.len() {
-            if (i+1) % 9 == 1 {
+            if (i + 1) % 9 == 1 {
                 to_add = format!("| {} ", self.cells[i]);
                 string_builder.push_str(&to_add);
-            } else if (i+1) % 9 == 0 {
+            } else if (i + 1) % 9 == 0 {
                 to_add = format!("{} |\n", self.cells[i]);
                 string_builder.push_str(&to_add);
-            } else if (i+1) % 3 == 0 {
+            } else if (i + 1) % 3 == 0 {
                 to_add = format!("{} | ", self.cells[i]);
                 string_builder.push_str(&to_add);
             } else {
@@ -115,10 +117,9 @@ impl fmt::Display for Board {
                 string_builder.push_str(&to_add);
             }
 
-            if (i+1) % 27 == 0 {
-                string_builder.push_str(line); 
+            if (i + 1) % 27 == 0 {
+                string_builder.push_str(line);
             }
-
         }
         // string_builder.push_str(line);
 
@@ -138,4 +139,3 @@ fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
 
     ret
 }
-
