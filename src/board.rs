@@ -7,6 +7,7 @@ use rand::thread_rng;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fmt;
+use std::string;
 
 pub struct Board {
     /* we do not need a 2d matrix as the board,
@@ -94,12 +95,17 @@ impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_builder = String::new();
 
+        let line = "-------------------------\n";
+
         let mut to_add;
 
+        string_builder.push_str(line);
         for i in 0..self.cells.len() {
-            
-            if (i+1) % 9 == 0 {
-                to_add = format!("{}\n", self.cells[i]);
+            if (i+1) % 9 == 1 {
+                to_add = format!("| {} ", self.cells[i]);
+                string_builder.push_str(&to_add);
+            } else if (i+1) % 9 == 0 {
+                to_add = format!("{} |\n", self.cells[i]);
                 string_builder.push_str(&to_add);
             } else if (i+1) % 3 == 0 {
                 to_add = format!("{} | ", self.cells[i]);
@@ -110,10 +116,11 @@ impl fmt::Display for Board {
             }
 
             if (i+1) % 27 == 0 {
-                string_builder.push_str("---------------------\n"); 
+                string_builder.push_str(line); 
             }
 
         }
+        // string_builder.push_str(line);
 
         write!(f, "{}", string_builder)
     }
