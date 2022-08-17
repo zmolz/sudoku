@@ -94,16 +94,18 @@ impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_builder = String::new();
 
+        let mut to_add;
+
         for i in 0..self.cells.len() {
             
             if (i+1) % 9 == 0 {
-                let to_add = format!("{}\n", self.cells[i]);
+                to_add = format!("{}\n", self.cells[i]);
                 string_builder.push_str(&to_add);
             } else if (i+1) % 3 == 0 {
-                let to_add = format!("{} | ", self.cells[i]);
+                to_add = format!("{} | ", self.cells[i]);
                 string_builder.push_str(&to_add);
             } else {
-                let to_add = format!("{} ", self.cells[i]);
+                to_add = format!("{} ", self.cells[i]);
                 string_builder.push_str(&to_add);
             }
 
