@@ -10,6 +10,7 @@ pub struct Cell {
     val: CellVal,
     pos: Coord,
 }
+
 impl Cell {
     pub fn new(val: CellVal, pos: Coord) -> Cell {
         Cell {
@@ -26,11 +27,24 @@ impl Cell {
         self.val
     }
 }
+
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.val)
     }
 }
+
+pub static CELL_VALS: [CellVal; 9] = [
+    CellVal::One,
+    CellVal::Two,
+    CellVal::Three,
+    CellVal::Four,
+    CellVal::Five,
+    CellVal::Six,
+    CellVal::Seven,
+    CellVal::Eight,
+    CellVal::Nine,
+];
 
 //////////////////////// CELL VAL ///////////////////////////
 
@@ -49,21 +63,8 @@ pub enum CellVal {
     Eight,
     Nine,
 }
-impl CellVal {
-    pub const fn vals() -> [CellVal; 9] {
-        [
-            CellVal::One,
-            CellVal::Two,
-            CellVal::Three,
-            CellVal::Four,
-            CellVal::Five,
-            CellVal::Six,
-            CellVal::Seven,
-            CellVal::Eight,
-            CellVal::Nine,
-        ]
-    }
 
+impl CellVal {
     // enums live on stack no need to borrow 
     fn val(self) -> String {
         match self {
@@ -79,6 +80,7 @@ impl CellVal {
         }
     }
 }
+
 impl fmt::Display for CellVal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.val())
@@ -94,6 +96,7 @@ pub struct Coord {
     i: usize,
     j: usize,
 }
+
 impl Coord {
     pub fn new(i: usize, j: usize) -> Coord {
         // usize can not be negative

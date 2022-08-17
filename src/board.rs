@@ -89,6 +89,7 @@ impl Board {
         neighbors
     }
 }
+
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_builder = String::new();
@@ -118,8 +119,7 @@ impl fmt::Display for Board {
 fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
     let mut ret: Vec<CellVal> = Vec::new();
 
-    // enums live on stack, no need to borrow
-    for cell_val in CellVal::vals() {
+    for cell_val in CELL_VALS {
         // O(1), no iteration. efficient
         if !neighbors.contains(&cell_val) {
             ret.push(cell_val);
