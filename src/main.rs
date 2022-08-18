@@ -22,9 +22,7 @@ fn main() {
     [NORMAL, N],
     [EASY, E]";
 
-    println!(
-        "enter difficulty setting: {}", difficulties
-    );
+    println!("enter difficulty setting: {}", difficulties);
 
     let mut input = String::new();
 
@@ -47,7 +45,8 @@ fn main() {
             b = Board::new(DIFFICULTY_EASY)
         } else {
             println!(
-                "error reading input, please enter a difficulty setting: {}", difficulties
+                "error reading input, please enter a difficulty setting: {}",
+                difficulties
             );
             input.clear();
             continue;
