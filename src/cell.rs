@@ -9,13 +9,15 @@ use std::fmt;
 pub struct Cell {
     val: CellVal,
     pos: Coord,
+    remaining: Vec<CellVal>,
 }
 
 impl Cell {
-    pub fn new(val: CellVal, pos: Coord) -> Cell {
+    pub fn new(val: CellVal, pos: Coord, remaining: Vec<CellVal>) -> Cell {
         Cell {
             val,
             pos,
+            remaining,
         }
     }
 
@@ -26,6 +28,10 @@ impl Cell {
     pub fn val(&self) -> CellVal {
         self.val
     }
+
+    pub fn remaining(&self) -> &Vec<CellVal> {
+        &self.remaining
+    } 
 }
 
 impl fmt::Display for Cell {
@@ -65,7 +71,7 @@ pub enum CellVal {
 }
 
 impl CellVal {
-    // enums live on stack no need to borrow 
+    // enums live on stack no need to borrow self or clone
     fn val(self) -> String {
         match self {
             CellVal::One => String::from("1"),
