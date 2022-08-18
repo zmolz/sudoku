@@ -15,6 +15,7 @@ pub struct Board {
     we need a Queue to support our
     recursive backtracking algorithm */
     cells: VecDeque<Cell>,
+    calls: i32,
 }
 
 impl Board {
@@ -22,50 +23,45 @@ impl Board {
         // initialize cell Queue
         let mut b: Board = Board {
             cells: VecDeque::new(),
+            calls: 0,
         };
 
         // start recursive algorithm with 1st row 1st col
-        b.fill_cells(1, 1, vec![], false);
+        b.fill_cells(1, 1, None);
 
         // return filled-in board
         b
     }
 
-    fn fill_cells(&mut self, i: usize, j: usize, remaining: Vec<CellVal>, flag: bool) -> () {
-        println!("{}\n\n", self);
+    fn fill_cells(&mut self, i: usize, j: usize, remaining: Option<Vec<CellVal>>) -> () {
+        self.calls += 1;
+
         // base case 1: board is filled in and we reached the 10th row
         if i == 10 {
             return;
         }
 
+        // create Coord
         let pos: Coord = Coord::new(i, j);
 
         let neighbors: HashSet<CellVal>;
         let mut options: Vec<CellVal>;
-        if !flag {
-            neighbors= self.get_neighbors(&pos);
-            options = cell_vals_diff(neighbors);
+
+        //
+        if let Some(rem) = remaining {
+            // if this is intended to be a backtracking call, use remaining cells
+            options = rem
         } else {
-            options = remaining
+            // iterate over cells in board and take those in the same col, row, or grid
+            neighbors = self.get_neighbors(&pos);
+
+            // find set difference between cell val options and the neighbors
+            options = cell_vals_diff(neighbors);
         }
-        // iterate over cells in board and take those in the same col, row, or grid
-        
 
-        // find set difference between cell val options and the neighbors
-
-        // base-case 2
+        // base-case 2, no valid options, could be entered by backtracking call or a next cell call
         if options.is_empty() {
             /*
-               if options is empty, we need to try another cellval
-               for the previous cell. to do this we must keep track of
-               cellvals we have not used for the previous cell, which will be
-               options[1..]. We need keep that vector unique to each frame.
-               (i.e. no shared mutability so no smart pointers YAYYYY)
-               every time that the remaining
-               cellvals array is empty, we backtrack, try another value, take
-               a step, if options is empty again we backtrack yet again, and if
-               the cell now has 0 choice we backtrack two cells. etc.
-
                we will have "psuedo recursive-backtracking" as i will call it, where
                the backtracking is not neccesarily going to pop a frame off the
                stack as it should, but rather we will control backtracking by
@@ -85,7 +81,7 @@ impl Board {
                O(n^2) in terms of time complexity.
             */
 
-            // we have removed the last cell from the queue
+            // remove the last cell from the queue
             let last = self.cells.pop_back().unwrap(); // safe to unwrap
 
             let rem = last.remaining();
@@ -94,8 +90,9 @@ impl Board {
             let pos = last.pos();
             let i = pos.row();
             let j = pos.col();
-            self.fill_cells(i, j, rem.to_owned(), true);
 
+            // to_owned() here is fine, as CellVals live on the stack
+            self.fill_cells(i, j, Some(rem.to_owned()));
         } else {
             // shuffle array if we have options
             let mut rng = thread_rng();
@@ -111,7 +108,7 @@ impl Board {
             // recursive step forwards
             let (i, j) = if j == 9 { (i + 1, 1) } else { (i, j + 1) };
 
-            self.fill_cells(i, j, vec![], false)
+            self.fill_cells(i, j, None)
         }
     }
 
@@ -160,6 +157,7 @@ impl fmt::Display for Board {
             }
         }
         // string_builder.push_str(line);
+        println!("{}", self.calls);
         write!(f, "{}", string_builder)
     }
 }
