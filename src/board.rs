@@ -84,7 +84,6 @@ impl Board {
             let i = pos.row();
             let j = pos.col();
 
-            // to_owned() here is fine, as CellVals live on the stack
             self.fill_cells(i, j, Some(rem.to_owned()));
         } else {
             // shuffle array if we have options
