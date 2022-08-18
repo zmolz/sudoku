@@ -4,7 +4,8 @@ use std::fmt;
 
 /**
 * each cell has a position described by a Coordinate struct,
-  a value described by a CellVal enumuration
+  a value described by a CellVal enumuration, and a list of 
+  remaining values to use in the backtracking algorithm
 */
 pub struct Cell {
     val: CellVal,
