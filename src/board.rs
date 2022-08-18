@@ -37,11 +37,9 @@ impl Board {
             return;
         }
 
-        // create Coord
         let pos: Coord = Coord::new(i, j);
 
         let mut options: Vec<CellVal>;
-
         // determine which CellVal options to use
         if let Some(rem) = remaining {
             // if this is intended to be a backtracking call, use remaining cells
