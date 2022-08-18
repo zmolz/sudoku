@@ -15,7 +15,6 @@ pub struct Board {
     we need a Queue to support our
     recursive backtracking algorithm */
     cells: VecDeque<Cell>,
-    calls: i32,
 }
 
 impl Board {
@@ -23,7 +22,6 @@ impl Board {
         // initialize cell Queue
         let mut b: Board = Board {
             cells: VecDeque::new(),
-            calls: 0,
         };
 
         // start recursive algorithm with 1st row 1st col
@@ -34,8 +32,6 @@ impl Board {
     }
 
     fn fill_cells(&mut self, i: usize, j: usize, remaining: Option<Vec<CellVal>>) -> () {
-        self.calls += 1;
-
         // base case 1: board is filled in and we reached the 10th row
         if i == 10 {
             return;
@@ -156,8 +152,6 @@ impl fmt::Display for Board {
                 string_builder.push_str(line);
             }
         }
-        // string_builder.push_str(line);
-        println!("{}", self.calls);
         write!(f, "{}", string_builder)
     }
 }
