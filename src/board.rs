@@ -40,7 +40,6 @@ impl Board {
         // create Coord
         let pos: Coord = Coord::new(i, j);
 
-        let neighbors: HashSet<CellVal>;
         let mut options: Vec<CellVal>;
 
         //
@@ -49,7 +48,7 @@ impl Board {
             options = rem
         } else {
             // iterate over cells in board and take those in the same col, row, or grid
-            neighbors = self.get_neighbors(&pos);
+             let neighbors: HashSet<CellVal> = self.get_neighbors(&pos);
 
             // find set difference between cell val options and the neighbors
             options = cell_vals_diff(neighbors);
