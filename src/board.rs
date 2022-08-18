@@ -1,6 +1,6 @@
 #[path = "cell.rs"]
 mod cell;
-use cell::*;
+use cell::{Cell, CellVal, CELL_VALS, Coord};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
