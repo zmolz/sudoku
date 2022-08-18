@@ -42,7 +42,7 @@ impl Board {
 
         let mut options: Vec<CellVal>;
 
-        //
+        // determine which CellVal options to use
         if let Some(rem) = remaining {
             // if this is intended to be a backtracking call, use remaining cells
             options = rem
