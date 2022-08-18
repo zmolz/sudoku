@@ -2,6 +2,7 @@
 mod cell;
 use cell::{Cell, CellVal, Coord, CELL_VALS};
 
+use rand::Rng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
@@ -27,7 +28,9 @@ impl Board {
         // start recursive algorithm with 1st row 1st col
         b.fill_cells(1, 1, None);
 
-        // return filled-in board
+        // remove values from filled-in board
+        b.remove_k_cells(17);
+
         b
     }
 
@@ -57,7 +60,7 @@ impl Board {
             /*
                we will have "psuedo recursive-backtracking" as i will call it, where
                the backtracking is not neccesarily going to pop a frame off the
-               stack as it should, but rather we will control backtracking by
+               stack as you would expect, but rather we will control backtracking by
                popping an element off the cell deque to remove the cell from the board
                and then making the next recursive call by calling fill_cells with
                the previous coord passed (which is just the coord of the last cell we just popped,
@@ -69,9 +72,9 @@ impl Board {
                but the upside is that the amount of total frames added will not
                change, and we do not need to worry about having recursive calls
                return values to the caller, but rather pass values to the next call.
-               everything will be callee side, which is not idiomatically the way
+               Which, ill say, is not idiomatically the way
                to recurse but nevertheless will be easier to code, and still
-               O(n^2) in terms of time complexity.
+               θ(n^2) in terms of time complexity.
             */
 
             // remove the last cell from the queue
@@ -117,6 +120,30 @@ impl Board {
 
         neighbors
     }
+
+    fn remove_k_cells(&mut self, k: usize) -> () {
+        let mut cell_indices: Vec<usize> = (0..81).collect();
+        let mut rng = thread_rng();
+        cell_indices.shuffle(&mut rng);
+        let indices_to_remove = cell_indices[..17].to_vec();
+
+        for i in indices_to_remove {
+            self.cells[i].to_empty_cell();
+        }
+    }
+}
+
+fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
+    let mut ret: Vec<CellVal> = Vec::new();
+
+    for cell_val in CELL_VALS {
+        // O(1), no iteration. efficient
+        if !neighbors.contains(&cell_val) {
+            ret.push(cell_val);
+        }
+    }
+
+    ret
 }
 
 // strictly for user-facing interface
@@ -149,17 +176,4 @@ impl fmt::Display for Board {
 
         write!(f, "{}", string_builder)
     }
-}
-
-fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
-    let mut ret: Vec<CellVal> = Vec::new();
-
-    for cell_val in CELL_VALS {
-        // O(1), no iteration. efficient
-        if !neighbors.contains(&cell_val) {
-            ret.push(cell_val);
-        }
-    }
-
-    ret
 }

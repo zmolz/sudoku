@@ -33,6 +33,10 @@ impl Cell {
     pub fn remaining(&self) -> &Vec<CellVal> {
         &self.remaining
     } 
+
+    pub fn to_empty_cell(&mut self) -> () {
+        self.val = CellVal::None;
+    }
 }
 
 impl fmt::Display for Cell {
@@ -60,6 +64,7 @@ pub static CELL_VALS: [CellVal; 9] = [
  */
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum CellVal {
+    None,
     One,
     Two,
     Three,
@@ -75,6 +80,7 @@ impl CellVal {
     // enums live on stack no need to borrow self or clone
     fn val(self) -> String {
         match self {
+            CellVal::None => String::from("_"),
             CellVal::One => String::from("1"),
             CellVal::Two => String::from("2"),
             CellVal::Three => String::from("3"),
