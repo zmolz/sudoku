@@ -2,12 +2,14 @@
 mod cell;
 use cell::{Cell, CellVal, Coord, CELL_VALS};
 
-use rand::Rng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fmt;
+
+const MAX_ROWS: usize = 9;
+const MAX_COLS: usize = 9;
 
 pub struct Board {
     /* we do not need a 2d matrix as the board,
@@ -19,7 +21,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new() -> Board {
+    pub fn new(k: usize) -> Board {
         // initialize cell Queue
         let mut b: Board = Board {
             cells: VecDeque::new(),
@@ -29,14 +31,14 @@ impl Board {
         b.fill_cells(1, 1, None);
 
         // remove values from filled-in board
-        b.remove_k_cells(17);
+        b.remove_k_cells(k);
 
         b
     }
 
     fn fill_cells(&mut self, i: usize, j: usize, remaining: Option<Vec<CellVal>>) -> () {
         // base case 1: board is filled in and we reached the 10th row
-        if i == 10 {
+        if i > MAX_ROWS {
             return;
         }
 
@@ -101,7 +103,7 @@ impl Board {
             self.cells.push_back(Cell::new(val, pos, remaining));
 
             // recursive step forwards
-            let (i, j) = if j == 9 { (i + 1, 1) } else { (i, j + 1) };
+            let (i, j) = if j == MAX_COLS { (i + 1, 1) } else { (i, j + 1) };
 
             self.fill_cells(i, j, None)
         }
@@ -125,7 +127,7 @@ impl Board {
         let mut cell_indices: Vec<usize> = (0..81).collect();
         let mut rng = thread_rng();
         cell_indices.shuffle(&mut rng);
-        let indices_to_remove = cell_indices[..17].to_vec();
+        let indices_to_remove = cell_indices[..k].to_vec();
 
         for i in indices_to_remove {
             self.cells[i].to_empty_cell();
