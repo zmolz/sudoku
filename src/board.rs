@@ -1,6 +1,6 @@
 #[path = "cell.rs"]
 mod cell;
-use cell::{Cell, CellVal, CELL_VALS, Coord};
+use cell::{Cell, CellVal, Coord, CELL_VALS};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -46,7 +46,7 @@ impl Board {
             options = rem
         } else {
             // iterate over cells in board and take those in the same col, row, or grid
-             let neighbors: HashSet<CellVal> = self.get_neighbors(&pos);
+            let neighbors: HashSet<CellVal> = self.get_neighbors(&pos);
 
             // find set difference between cell val options and the neighbors
             options = cell_vals_diff(neighbors);
@@ -86,7 +86,7 @@ impl Board {
 
             self.fill_cells(i, j, Some(rem.to_owned()));
         } else {
-            // shuffle array if we have options
+            // shuffle array if we have options (would reshuffle on a backtracking call, change later)
             let mut rng = thread_rng();
             options.shuffle(&mut rng);
 
