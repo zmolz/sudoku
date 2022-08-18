@@ -123,9 +123,7 @@ impl Board {
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_builder = String::new();
-
         let line = "-------------------------\n";
-
         let mut to_add;
 
         string_builder.push_str(line);
@@ -148,6 +146,7 @@ impl fmt::Display for Board {
                 string_builder.push_str(line);
             }
         }
+
         write!(f, "{}", string_builder)
     }
 }
