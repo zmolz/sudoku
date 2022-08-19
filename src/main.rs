@@ -24,7 +24,7 @@ fn main() {
 
     println!("enter difficulty setting: {}", difficulties);
 
-    let mut input = String::new();
+    let mut input = &String::new();
 
     let b: Board;
 
@@ -33,9 +33,9 @@ fn main() {
             .read_line(&mut input)
             .expect("error reading line");
 
-        input = input.trim().to_uppercase();
+        input = &input.trim().to_uppercase()[..];
 
-        if IMPOSSIBLE.contains(&&input[..]) {
+        if IMPOSSIBLE.contains(&input) {
             b = Board::new(DIFFICULTY_IMPOSSIBLE);
         } else if HARD.contains(&&input[..]) {
             b = Board::new(DIFFICULTY_HARD);
