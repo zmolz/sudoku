@@ -1,5 +1,6 @@
 mod board;
-use board::Board;
+use board::{Board, Solver};
+
 use std::io;
 
 const IMPOSSIBLE: [&str; 2] = ["IMPOSSIBLE", "I"];
@@ -15,27 +16,30 @@ const DIFFICULTY_HARD: usize = 48;
 const DIFFICULTY_NORMAL: usize = 32;
 const DIFFICULTY_EASY: usize = 16;
 
+const DIFFICULTIES: &str = "
+[IMPOSSIBLE, I]
+[HARD, H],
+[NORMAL, N],
+[EASY, E]";
+
 fn main() {
-    let difficulties = "
-    [IMPOSSIBLE, I]
-    [HARD, H],
-    [NORMAL, N],
-    [EASY, E]";
 
-    println!("enter difficulty setting: {}", difficulties);
 
-    let mut input = &String::new();
+    println!("enter difficulty setting: {}", DIFFICULTIES);
+
+    let mut input = String::new();
 
     let b: Board;
 
+    // set game difficulty (difficulty here is measured by amount of clues)
     loop {
         io::stdin()
             .read_line(&mut input)
             .expect("error reading line");
 
-        input = &input.trim().to_uppercase()[..];
+        input = input.trim().to_uppercase();
 
-        if IMPOSSIBLE.contains(&input) {
+        if IMPOSSIBLE.contains(&&input[..]) {
             b = Board::new(DIFFICULTY_IMPOSSIBLE);
         } else if HARD.contains(&&input[..]) {
             b = Board::new(DIFFICULTY_HARD);
@@ -46,7 +50,7 @@ fn main() {
         } else {
             println!(
                 "error reading input, please enter a difficulty setting: {}",
-                difficulties
+                DIFFICULTIES
             );
             input.clear();
             continue;
@@ -56,4 +60,11 @@ fn main() {
     }
 
     println!("{}", b);
+
+
+    // solver struct not neccesarily necessary but 
+    // helps to organize the board.rs file
+    let mut solver = Solver::new(b);
+
+    solver.auto_solve();
 }

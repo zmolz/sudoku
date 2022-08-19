@@ -60,9 +60,9 @@ impl Board {
         // base-case 2, no valid options, could be entered by backtracking call or a next cell call
         if options.is_empty() {
             /*
-               we will have "psuedo recursive-backtracking" as i will call it, where
+               we will have "psuedo recursive-backtracking", where
                the backtracking is not neccesarily going to pop a frame off the
-               stack as you would expect, but rather we will control backtracking by
+               stack as you might expect, but rather we will control backtracking by
                popping an element off the cell deque to remove the cell from the board
                and then making the next recursive call by calling fill_cells with
                the previous coord passed (which is just the coord of the last cell we just popped,
@@ -177,5 +177,29 @@ impl fmt::Display for Board {
         }
 
         write!(f, "{}", string_builder)
+    }
+}
+
+//////////////////////// SOLVER ///////////////////////////
+
+pub struct Solver {
+    board: Board,
+    is_solved: bool,
+    cells_left: usize,
+}
+
+impl Solver {
+    pub fn new(board: Board) -> Solver {
+
+
+        Solver { board: board, is_solved: false, cells_left: 10 }
+    }
+
+    pub fn auto_solve(&mut self) -> () {
+        
+    }
+
+    pub fn check_cells_left(&self) -> usize {
+
     }
 }
