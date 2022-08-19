@@ -103,7 +103,11 @@ impl Board {
             self.cells.push_back(Cell::new(val, pos, remaining));
 
             // recursive step forwards
-            let (i, j) = if j == MAX_COLS { (i + 1, 1) } else { (i, j + 1) };
+            let (i, j) = if j == MAX_COLS {
+                (i + 1, 1)
+            } else {
+                (i, j + 1)
+            };
 
             self.fill_cells(i, j, None)
         }
@@ -132,6 +136,13 @@ impl Board {
         for i in indices_to_remove {
             self.cells[i].to_empty_cell();
         }
+    }
+
+    pub fn check_cells_left(&self) -> usize {
+        self.cells.iter().fold(
+            0,
+            |a: usize, x: &Cell| if x.val() == CellVal::None { a + 1 } else { a },
+        )
     }
 }
 
@@ -190,16 +201,14 @@ pub struct Solver {
 
 impl Solver {
     pub fn new(board: Board) -> Solver {
-
-
-        Solver { board: board, is_solved: false, cells_left: 10 }
+        let cells_left = board.check_cells_left();
+        let is_solved = false;
+        Solver {
+            board,
+            is_solved,
+            cells_left,
+        }
     }
 
-    pub fn auto_solve(&mut self) -> () {
-        
-    }
-
-    pub fn check_cells_left(&self) -> usize {
-
-    }
+    pub fn auto_solve(&mut self) -> () {}
 }
