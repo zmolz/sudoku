@@ -105,6 +105,7 @@ impl fmt::Display for CellVal {
 /**
  * Coordinate struct defines a row/col position in the board
  */
+
 pub struct Coord {
     i: usize,
     j: usize,

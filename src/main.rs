@@ -24,7 +24,6 @@ const DIFFICULTIES: &str = "
 
 fn main() {
 
-
     println!("enter difficulty setting: {}", DIFFICULTIES);
 
     let mut input = String::new();
@@ -61,9 +60,6 @@ fn main() {
 
     println!("{}", b);
 
-
-    // solver struct not neccesarily necessary but 
-    // helps to organize the board.rs file
     let mut solver = Solver::new(b);
 
     solver.auto_solve();

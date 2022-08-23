@@ -137,13 +137,6 @@ impl Board {
             self.cells[i].to_empty_cell();
         }
     }
-
-    pub fn check_cells_left(&self) -> usize {
-        self.cells.iter().fold(
-            0,
-            |a: usize, x: &Cell| if x.val() == CellVal::None { a + 1 } else { a },
-        )
-    }
 }
 
 fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
@@ -195,20 +188,31 @@ impl fmt::Display for Board {
 
 pub struct Solver {
     board: Board,
-    is_solved: bool,
-    cells_left: usize,
+    indices_to_solve: Vec<usize>,
 }
 
 impl Solver {
     pub fn new(board: Board) -> Solver {
-        let cells_left = board.check_cells_left();
-        let is_solved = false;
-        Solver {
-            board,
-            is_solved,
-            cells_left,
+        let mut indices_to_solve: Vec<usize> = Vec::new(); 
+
+        for (i, cell) in board.cells.iter().enumerate() {
+            if cell.val() == CellVal::None {
+                indices_to_solve.push(i);
+            }
         }
+
+        Solver { board, indices_to_solve }
     }
 
-    pub fn auto_solve(&mut self) -> () {}
+    pub fn auto_solve(&mut self) -> () {
+        let index = self.indices_to_solve[0];
+
+        let cell = &self.board.cells;
+
+        
+    }
+
+    fn auto_solve_step(&mut self, cell: &Cell) -> () {
+        //base case board is solved
+    }
 }
