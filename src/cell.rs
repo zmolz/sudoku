@@ -7,6 +7,7 @@ use std::fmt;
   a value described by a CellVal enumuration, and a list of 
   remaining values to use in the backtracking algorithm
 */
+#[derive(Debug)]
 pub struct Cell {
     val: CellVal,
     pos: Coord,
@@ -37,6 +38,14 @@ impl Cell {
     pub fn to_empty_cell(&mut self) -> () {
         self.val = CellVal::None;
     }
+
+    pub fn set_val(&mut self, val: CellVal) -> () {
+        self.val = val;
+    }
+
+    pub fn set_remaining(&mut self, remaining: Vec<CellVal>) -> () {
+        self.remaining = remaining;
+    }
 }
 
 impl fmt::Display for Cell {
@@ -62,7 +71,7 @@ pub static CELL_VALS: [CellVal; 9] = [
 /**
  * CellVal enum describes the value (1-9 or None) of a Cell
  */
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum CellVal {
     None,
     One,
@@ -105,7 +114,7 @@ impl fmt::Display for CellVal {
 /**
  * Coordinate struct defines a row/col position in the board
  */
-
+#[derive(Debug)]
 pub struct Coord {
     i: usize,
     j: usize,

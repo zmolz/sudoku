@@ -23,7 +23,6 @@ const DIFFICULTIES: &str = "
 [EASY, E]";
 
 fn main() {
-
     println!("enter difficulty setting: {}", DIFFICULTIES);
 
     let mut input = String::new();
@@ -63,4 +62,6 @@ fn main() {
     let mut solver = Solver::new(b);
 
     solver.auto_solve();
+
+    println!("{}", solver);
 }
