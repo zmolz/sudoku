@@ -38,14 +38,6 @@ impl Cell {
     pub fn to_empty_cell(&mut self) -> () {
         self.val = CellVal::None;
     }
-
-    pub fn set_val(&mut self, val: CellVal) -> () {
-        self.val = val;
-    }
-
-    pub fn set_remaining(&mut self, remaining: Vec<CellVal>) -> () {
-        self.remaining = remaining;
-    }
 }
 
 impl fmt::Display for Cell {

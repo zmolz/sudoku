@@ -4,7 +4,6 @@ use cell::{Cell, CellVal, Coord, CELL_VALS};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fmt;
@@ -138,18 +137,6 @@ impl Board {
             self.cells[i].to_empty_cell();
         }
     }
-
-    fn get_indices(&self) -> Vec<usize> {
-        let mut indices_to_solve: Vec<usize> = Vec::new();
-
-        for (i, cell) in self.cells.iter().enumerate() {
-            if cell.val() == CellVal::None {
-                indices_to_solve.push(i);
-            }
-        }
-
-        indices_to_solve
-    }
 }
 
 fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
@@ -194,85 +181,5 @@ impl fmt::Display for Board {
         }
 
         write!(f, "{}", string_builder)
-    }
-}
-
-//////////////////////// SOLVER ///////////////////////////
-
-pub struct Solver {
-    board: Board,
-    indices_to_solve: Vec<usize>,
-    amt_to_solve: usize,
-}
-
-impl Solver {
-    pub fn new(board: Board) -> Solver {
-        let indices_to_solve = board.get_indices();
-
-        let amt_to_solve = indices_to_solve.len();
-
-        Solver {
-            board,
-            indices_to_solve,
-            amt_to_solve,
-        }
-    }
-
-    pub fn auto_solve(&mut self) -> () {
-        self.auto_solve_step(0, None);
-    }
-
-    fn auto_solve_step(&mut self, i: usize, remaining: Option<Vec<CellVal>>) -> () {
-        if i >= self.amt_to_solve {
-            return;
-        }
-        let cell_index = self.indices_to_solve[i];
-
-        let cell = &self.board.cells[cell_index];
-        let pos = cell.pos();
-
-        let mut options: Vec<CellVal>;
-
-        // determine which CellVal options to use
-        if let Some(rem) = remaining {
-            // if this is intended to be a backtracking call, use remaining cells
-            options = rem
-        } else {
-            // iterate over cells in board and take those in the same col, row, or grid
-            let neighbors: HashSet<CellVal> = self.board.get_neighbors(pos);
-
-            // find set difference between cell val options and the neighbors
-            options = cell_vals_diff(neighbors);
-        }
-
-        if options.is_empty() {
-            // get the prev cell
-            let prev_index = cell_index - 1;
-            let prev = &self.board.cells[prev_index];
-            let rem = prev.remaining();
-
-            self.auto_solve_step(i-1, Some(rem.to_owned()));
-        } else {
-            // shuffle array if we have options
-            let mut rng = thread_rng();
-            options.shuffle(&mut rng);
-
-            // get value to add
-            let val = options[0];
-            let remaining = options[1..].to_vec();
-
-            // re-set val and remaining for cell
-            self.board.cells[cell_index].set_val(val);
-            self.board.cells[cell_index].set_remaining(remaining);
-
-            // recursive step forwards
-            self.auto_solve_step(i+1, None)
-        }
-    }
-}
-
-impl fmt::Display for Solver {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.board)
     }
 }

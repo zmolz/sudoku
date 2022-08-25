@@ -1,5 +1,5 @@
 mod board;
-use board::{Board, Solver};
+use board::Board;
 
 use std::io;
 
@@ -17,10 +17,10 @@ const DIFFICULTY_NORMAL: usize = 32;
 const DIFFICULTY_EASY: usize = 16;
 
 const DIFFICULTIES: &str = "
-[IMPOSSIBLE, I]
-[HARD, H],
-[NORMAL, N],
-[EASY, E]";
+[IMPOSSIBLE/I]
+[HARD/H],
+[NORMAL/N],
+[EASY/E]";
 
 fn main() {
     println!("enter difficulty setting: {}", DIFFICULTIES);
@@ -59,9 +59,5 @@ fn main() {
 
     println!("{}", b);
 
-    let mut solver = Solver::new(b);
-
-    solver.auto_solve();
-
-    println!("{}", solver);
+    
 }
