@@ -4,9 +4,11 @@ use cell::{Cell, CellVal, Coord, CELL_VALS};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fmt;
+use std::rc::Rc;
 
 const MAX_ROWS: usize = 9;
 const MAX_COLS: usize = 9;
@@ -18,6 +20,11 @@ pub struct Board {
     we need a Queue to support our
     recursive backtracking algorithm */
     cells: VecDeque<Cell>,
+
+    /* this attribute will help us implement
+    an "is_solved" function by mapping each coord
+    in the solved board to a value.  */
+    pos_to_cell: HashMap<Rc<Coord>, CellVal>,
 }
 
 impl Board {
@@ -25,18 +32,23 @@ impl Board {
         // initialize cell Queue
         let mut b: Board = Board {
             cells: VecDeque::new(),
+            pos_to_cell: HashMap::new(),
         };
 
         // start recursive algorithm with 1st row 1st col
         b.fill_cells(1, 1, None);
 
+        // fill in pos_to_cell
+        b.map_coord_to_cells();
+
         // remove values from filled-in board
         b.remove_k_cells(k);
 
+        // return ready-to-solve board
         b
     }
 
-    fn fill_cells(&mut self, i: usize, j: usize, remaining: Option<Vec<CellVal>>) -> () {
+    fn fill_cells(&mut self, i: usize, j: usize, remaining: Option<Vec<CellVal>>) {
         // base case 1: board is filled in and we reached the 10th row
         if i > MAX_ROWS {
             return;
@@ -66,30 +78,29 @@ impl Board {
                popping an element off the cell deque to remove the cell from the board
                and then making the next recursive call by calling fill_cells with
                the previous coord passed (which is just the coord of the last cell we just popped,
-               so theres no logic or control flow neccesary to evaluate what that
-               coord will be.
+               so theres no logic neccesary to evaluate what that coord will be.
 
                Downside is obviously that the algorithm will be less
                memory efficient in terms of concurrent stack size,
                but the upside is that the amount of total frames added will not
                change, and we do not need to worry about having recursive calls
                return values to the caller, but rather pass values to the next call.
-               Which, ill say, is not idiomatically the way
+               Which, ill admit, is not idiomatically the way
                to recurse but nevertheless will be easier to code, and still
-               θ(n^2) in terms of time complexity.
+               θ(n^2) in terms of time complexity. (with n = num rows | col)
             */
 
             // remove the last cell from the queue
             let last = self.cells.pop_back().unwrap(); // safe to unwrap
 
-            let rem = last.remaining();
+            let remaining = Some(last.remaining().to_owned());
 
             // recursive step backwards
             let pos = last.pos();
             let i = pos.row();
             let j = pos.col();
 
-            self.fill_cells(i, j, Some(rem.to_owned()));
+            self.fill_cells(i, j, remaining);
         } else {
             // shuffle array if we have options (would reshuffle on a backtracking call, change later)
             let mut rng = thread_rng();
@@ -127,7 +138,15 @@ impl Board {
         neighbors
     }
 
-    fn remove_k_cells(&mut self, k: usize) -> () {
+    fn map_coord_to_cells(&mut self) {
+        for cell in &self.cells {
+            let pos = Rc::new(*cell.pos());
+            let cellval = cell.val();
+            self.pos_to_cell.insert(pos, cellval);
+        }
+    }
+
+    fn remove_k_cells(&mut self, k: usize) {
         let mut cell_indices: Vec<usize> = (0..81).collect();
         let mut rng = thread_rng();
         cell_indices.shuffle(&mut rng);

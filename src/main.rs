@@ -1,5 +1,5 @@
 mod board;
-use board::Board;
+use board::{Board};
 
 use std::io;
 
@@ -11,6 +11,7 @@ const NORMAL: [&str; 2] = ["NORMAL", "N"];
 
 const EASY: [&str; 2] = ["EASY", "E"];
 
+// all of these sizes guarantee 1 unique solution
 const DIFFICULTY_IMPOSSIBLE: usize = 64;
 const DIFFICULTY_HARD: usize = 48;
 const DIFFICULTY_NORMAL: usize = 32;
