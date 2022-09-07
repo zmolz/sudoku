@@ -1,1 +1,0 @@
-((2^(sqrt(log(x)) - 1) * log(2))/ (x * sqrt (log(x)))
