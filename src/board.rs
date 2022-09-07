@@ -171,35 +171,89 @@ fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
     ret
 }
 
-// strictly for user-facing interface
-impl fmt::Display for Board {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut string_builder = String::new();
-        let line = "-------------------------\n";
-        let mut to_add;
+// takes ownership of the values in the queue and converts them to a HashMap
+fn queue_to_hashmap(queue: VecDeque<Cell>) -> HashMap<Rc<Coord>, CellVal> {
+    let mut ret: HashMap<Rc<Coord>, CellVal> = HashMap::new();
 
-        string_builder.push_str(line);
-        for i in 0..self.cells.len() {
-            if (i + 1) % 9 == 1 {
-                to_add = format!("| {} ", self.cells[i]);
-                string_builder.push_str(&to_add);
-            } else if (i + 1) % 9 == 0 {
-                to_add = format!("{} |\n", self.cells[i]);
-                string_builder.push_str(&to_add);
-            } else if (i + 1) % 3 == 0 {
-                to_add = format!("{} | ", self.cells[i]);
-                string_builder.push_str(&to_add);
-            } else {
-                to_add = format!("{} ", self.cells[i]);
-                string_builder.push_str(&to_add);
+    for cell in queue {
+        let pos = Rc::new(*cell.pos());
+        let cellval = cell.val();
+        ret.insert(pos, cellval);
+    }
+
+    ret
+}
+
+#[derive(Debug)]
+pub struct Solver {
+    // solved board
+    solved: HashMap<Rc<Coord>, CellVal>,
+
+    // the board to solve
+    active: HashMap<Rc<Coord>, CellVal>,
+}
+
+impl Solver {
+    pub fn new(board: Board) -> Solver {
+        Solver {
+            solved: board.pos_to_cell,
+            active: queue_to_hashmap(board.cells),
+            /* we want to take ownership here
+            and convert the queue to a hashmap
+            so that interaction with the active board will be easier
+            and we can drop the Cell struct which deals with
+            the remaining values, which is not necessary for the solver.
+            comparing two of the same data structure is easier than
+            comparing two different ones */
+        }
+    }
+
+    /* very simple is_solved function compared to potentially having
+    to iterate over the cells queue, deconstruct their position and value,
+    etc */
+    pub fn is_solved(&self) -> bool {
+        self.solved == self.active
+    }
+
+    pub fn fill_cell(&mut self, row: usize, col: usize, val: usize) -> bool {
+        // make sure to not change a cell that was given as a clue
+
+        let pos = Rc::new(Coord::new(row, col));
+
+        // if pos was given as clue - return false
+
+        // else
+        let val: CellVal = CellVal::new(val);
+        self.active.insert(pos, val);
+        true
+    }
+
+}
+
+impl fmt::Display for Solver {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut ret = String::new();
+        ret.push_str("\n-------------------------\n");
+
+        for i in 1..=MAX_ROWS {
+            ret.push_str("| ");
+            for j in 1..=MAX_COLS {
+                let pos = Coord::new(i, j);
+                let val = self.active.get(&pos).unwrap();
+
+                ret.push_str(&format!("{} ", val));
+                if j % 3 == 0 {
+                    ret.push_str("| ");
+                }
             }
 
-            if (i + 1) % 27 == 0 {
-                string_builder.push_str(line);
+            if i % 3 == 0 {
+                ret.push_str("\n-------------------------\n");
+            } else {
+                ret.push_str("\n")
             }
         }
 
-        write!(f, "{}", string_builder)
+        write!(f, "{}", ret)
     }
 }
-
