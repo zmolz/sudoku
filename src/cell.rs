@@ -1,4 +1,30 @@
 use std::fmt;
+#[derive(Debug, Clone)]
+
+pub struct Error {
+    message: String,
+}
+
+impl Error {
+    fn bounds_error() -> Error {
+        Error {
+            message: "Index out of bounds".to_string(),
+        }
+    }
+
+    pub fn overwrite_error() -> Error {
+        Error {
+            message: "Cannot overwrite cell given as clue".to_string(),
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
 
 ///////////////////////// CELL /////////////////////////////
 
@@ -7,6 +33,7 @@ use std::fmt;
   a value described by a CellVal enumuration, and a list of 
   remaining values to use in the backtracking algorithm
 */
+#[derive(Debug, Clone)]
 pub struct Cell {
     val: CellVal,
     pos: Coord,
@@ -62,7 +89,7 @@ pub static CELL_VALS: [CellVal; 9] = [
 /**
  * CellVal enum describes the value (1-9 or None) of a Cell
  */
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum CellVal {
     None,
     One,
@@ -92,6 +119,21 @@ impl CellVal {
             CellVal::Nine => String::from("9"),
         }
     }
+
+    pub fn new(val: usize) -> CellVal {
+        match val {
+            1 => CellVal::One,
+            2 => CellVal::Two,
+            3 => CellVal::Three,
+            4 => CellVal::Four,
+            5 => CellVal::Five,
+            6 => CellVal::Six,
+            7 => CellVal::Seven,
+            8 => CellVal::Eight,
+            9 => CellVal::Nine,
+            _ => CellVal::None,
+        }
+    }
 }
 
 impl fmt::Display for CellVal {
@@ -105,19 +147,20 @@ impl fmt::Display for CellVal {
 /**
  * Coordinate struct defines a row/col position in the board
  */
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 pub struct Coord {
     i: usize,
     j: usize,
 }
 
 impl Coord {
-    pub fn new(i: usize, j: usize) -> Coord {
+    pub fn new(i: usize, j: usize) -> Result<Coord, Error> {
         // usize can not be negative
-        if i > 9 || j > 9 {
-            panic!("Coord values passed are not within the board's boundaries")
+        if i > 9 || j > 9 || i == 0 || j == 0 {
+            Result::Err(Error::bounds_error())
+        } else {
+            Result::Ok(Coord { i, j })
         }
-        Coord { i, j }
     }
 
     pub fn row(&self) -> usize {

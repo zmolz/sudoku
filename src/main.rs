@@ -1,16 +1,12 @@
 mod board;
-use board::Board;
-
+use board::{Board, Solver};
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::io;
 
 const IMPOSSIBLE: [&str; 2] = ["IMPOSSIBLE", "I"];
-
 const HARD: [&str; 2] = ["HARD", "H"];
-
 const NORMAL: [&str; 2] = ["NORMAL", "N"];
-
 const EASY: [&str; 2] = ["EASY", "E"];
 
 // all of these sizes guarantee 1 unique solution
@@ -26,7 +22,7 @@ const DIFFICULTIES: &str = "
 [EASY/E]";
 
 lazy_static! {
-    static ref NUM_PAT: Regex = Regex::new(r"^(\d, \d)$").unwrap();
+    static ref COORD_MATCH: Regex = Regex::new(r"^(\d)(, |,| )(\d)(, |,| )(\d)$").unwrap();
 }
 
 fn main() {
@@ -51,7 +47,7 @@ fn main() {
         } else if NORMAL.contains(&&input[..]) {
             b = Board::new(DIFFICULTY_NORMAL);
         } else if EASY.contains(&&input[..]) {
-            b = Board::new(DIFFICULTY_EASY)
+            b = Board::new(DIFFICULTY_EASY);
         } else {
             println!(
                 "error reading input, please enter a difficulty setting: {}",
@@ -64,21 +60,40 @@ fn main() {
         break;
     }
 
-    println!("{}", b);
+    let mut solver = Solver::new(b);
 
-    input.clear();
+    let mut row: usize;
+    let mut col: usize;
+    let mut val: usize;
 
-    'outer: loop {
-        println!("enter cell in format (row, col)");
+    loop {
+        println!("{}", solver);
 
+        input.clear();
+        println!("enter a cell and val (1-9, 0 to clear) as following:\trow, col, val\n\t");
         io::stdin()
             .read_line(&mut input)
             .expect("error reading line");
+        input = input.trim().to_string();
+        if let Some(cap) = COORD_MATCH.captures(&input) {
+            row = cap[1].parse().unwrap();
+            col = cap[3].parse().unwrap();
+            val = cap[5].parse().unwrap(); // safe to unwrap, validated by regex
+        } else {
+            println!("error reading input, please try again, following format");
+            continue; // invalid input, try again
+        }
 
-        loop {
-            if b.is_solved() {
-                break 'outer;
+        match solver.fill_cell(row, col, val) {
+            Ok(_) => (),
+            Err(e) => {
+                println!("error: {}", e);
+                continue;
             }
+        }
+        if solver.is_solved() {
+            println!("solved!");
+            break;
         }
     }
 }
