@@ -1,4 +1,30 @@
 use std::fmt;
+#[derive(Debug, Clone)]
+
+pub struct Error {
+    message: String,
+}
+
+impl Error {
+    fn bounds_error() -> Error {
+        Error {
+            message: "Index out of bounds".to_string(),
+        }
+    }
+
+    pub fn overwrite_error() -> Error {
+        Error {
+            message: "Cannot overwrite cell given as clue".to_string(),
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
 
 ///////////////////////// CELL /////////////////////////////
 
@@ -7,7 +33,7 @@ use std::fmt;
   a value described by a CellVal enumuration, and a list of 
   remaining values to use in the backtracking algorithm
 */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cell {
     val: CellVal,
     pos: Coord,
@@ -128,12 +154,13 @@ pub struct Coord {
 }
 
 impl Coord {
-    pub fn new(i: usize, j: usize) -> Coord {
+    pub fn new(i: usize, j: usize) -> Result<Coord, Error> {
         // usize can not be negative
-        if i > 9 || j > 9 {
-            panic!("Coord values passed are not within the board's boundaries")
+        if i > 9 || j > 9 || i == 0 || j == 0 {
+            Result::Err(Error::bounds_error())
+        } else {
+            Result::Ok(Coord { i, j })
         }
-        Coord { i, j }
     }
 
     pub fn row(&self) -> usize {

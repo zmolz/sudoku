@@ -1,6 +1,6 @@
 #[path = "cell.rs"]
 mod cell;
-use cell::{Cell, CellVal, Coord, CELL_VALS};
+use cell::{Cell, CellVal, Coord, CELL_VALS, Error};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -54,7 +54,7 @@ impl Board {
             return;
         }
 
-        let pos: Coord = Coord::new(i, j);
+        let pos: Coord = Coord::new(i, j).unwrap(); // safe, programmer controlled
 
         let mut options: Vec<CellVal>;
         // determine which CellVal options to use
@@ -191,13 +191,23 @@ pub struct Solver {
 
     // the board to solve
     active: HashMap<Rc<Coord>, CellVal>,
+
+    // cells given as clues
+    clues: HashSet<Rc<Coord>>,
 }
 
 impl Solver {
     pub fn new(board: Board) -> Solver {
+        let mut clues: HashSet<Rc<Coord>> = HashSet::new();
+        for cell in &board.cells {
+            let pos = Rc::new(*cell.pos());
+            clues.insert(pos);
+        }
         Solver {
             solved: board.pos_to_cell,
             active: queue_to_hashmap(board.cells),
+            clues: clues,
+        }
             /* we want to take ownership here
             and convert the queue to a hashmap
             so that interaction with the active board will be easier
@@ -205,7 +215,6 @@ impl Solver {
             the remaining values, which is not necessary for the solver.
             comparing two of the same data structure is easier than
             comparing two different ones */
-        }
     }
 
     /* very simple is_solved function compared to potentially having
@@ -215,17 +224,21 @@ impl Solver {
         self.solved == self.active
     }
 
-    pub fn fill_cell(&mut self, row: usize, col: usize, val: usize) -> bool {
-        // make sure to not change a cell that was given as a clue
+    pub fn fill_cell(&mut self, row: usize, col: usize, val: usize) -> Result<(), Error>{
+        let pos = Coord::new(row, col);
+        let coord: Rc<Coord>;
+        match pos {
+            Ok(c) => (coord = Rc::new(c)),
+            Err(e) => return Err(e),
+        }
 
-        let pos = Rc::new(Coord::new(row, col));
-
-        // if pos was given as clue - return false
-
-        // else
+        if self.clues.contains(&coord) {
+            return Err(Error::overwrite_error());
+        }
+        
         let val: CellVal = CellVal::new(val);
-        self.active.insert(pos, val);
-        true
+        self.active.insert(coord, val);
+        Ok(())
     }
 
 }
@@ -238,7 +251,7 @@ impl fmt::Display for Solver {
         for i in 1..=MAX_ROWS {
             ret.push_str("| ");
             for j in 1..=MAX_COLS {
-                let pos = Coord::new(i, j);
+                let pos = Coord::new(i, j).unwrap();
                 let val = self.active.get(&pos).unwrap();
 
                 ret.push_str(&format!("{} ", val));
