@@ -24,7 +24,7 @@ pub struct Board {
     /* this attribute will help us implement
     an "is_solved" function by mapping each coord
     in the solved board to a value.  */
-    pos_to_cell: HashMap<Rc<Coord>, CellVal>,
+    pos_to_val: HashMap<Rc<Coord>, CellVal>,
 }
 
 impl Board {
@@ -32,7 +32,7 @@ impl Board {
         // initialize cell Queue
         let mut b: Board = Board {
             cells: VecDeque::new(),
-            pos_to_cell: HashMap::new(),
+            pos_to_val: HashMap::new(),
         };
 
         // start recursive algorithm with 1st row 1st col
@@ -142,7 +142,7 @@ impl Board {
         for cell in &self.cells {
             let pos = Rc::new(*cell.pos());
             let cellval = cell.val();
-            self.pos_to_cell.insert(pos, cellval);
+            self.pos_to_val.insert(pos, cellval);
         }
     }
 
@@ -155,6 +155,20 @@ impl Board {
         for i in indices_to_remove {
             self.cells[i].to_empty_cell();
         }
+    }
+
+    pub fn is_solved(&self) -> bool {
+
+        for cell in &self.cells {
+            let pos = cell.pos();
+            let val = cell.val();
+
+            if self.pos_to_val[pos] != val {
+                return false;
+            }
+        }
+
+        true
     }
 }
 

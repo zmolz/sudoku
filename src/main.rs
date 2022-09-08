@@ -1,6 +1,8 @@
 mod board;
-use board::{Board};
+use board::Board;
 
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::io;
 
 const IMPOSSIBLE: [&str; 2] = ["IMPOSSIBLE", "I"];
@@ -22,6 +24,10 @@ const DIFFICULTIES: &str = "
 [HARD/H],
 [NORMAL/N],
 [EASY/E]";
+
+lazy_static! {
+    static ref NUM_PAT: Regex = Regex::new(r"^(\d, \d)$").unwrap();
+}
 
 fn main() {
     println!("enter difficulty setting: {}", DIFFICULTIES);
@@ -60,5 +66,19 @@ fn main() {
 
     println!("{}", b);
 
-    
+    input.clear();
+
+    'outer: loop {
+        println!("enter cell in format (row, col)");
+
+        io::stdin()
+            .read_line(&mut input)
+            .expect("error reading line");
+
+        loop {
+            if b.is_solved() {
+                break 'outer;
+            }
+        }
+    }
 }
