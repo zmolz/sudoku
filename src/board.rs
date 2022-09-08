@@ -156,20 +156,6 @@ impl Board {
             self.cells[i].to_empty_cell();
         }
     }
-
-    pub fn is_solved(&self) -> bool {
-
-        for cell in &self.cells {
-            let pos = cell.pos();
-            let val = cell.val();
-
-            if self.pos_to_val[pos] != val {
-                return false;
-            }
-        }
-
-        true
-    }
 }
 
 fn cell_vals_diff(neighbors: HashSet<CellVal>) -> Vec<CellVal> {
@@ -214,11 +200,12 @@ impl Solver {
     pub fn new(board: Board) -> Solver {
         let mut clues: HashSet<Rc<Coord>> = HashSet::new();
         for cell in &board.cells {
+            if cell.val() == CellVal::None { continue; }
             let pos = Rc::new(*cell.pos());
             clues.insert(pos);
         }
         Solver {
-            solved: board.pos_to_cell,
+            solved: board.pos_to_val,
             active: queue_to_hashmap(board.cells),
             clues: clues,
         }
