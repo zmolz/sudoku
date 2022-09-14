@@ -1,6 +1,6 @@
 #[path = "cell.rs"]
 mod cell;
-use cell::{Cell, CellVal, Coord, CELL_VALS, Error};
+use cell::{Cell, CellVal, Coord, Error, CELL_VALS};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -200,7 +200,9 @@ impl Solver {
     pub fn new(board: Board) -> Solver {
         let mut clues: HashSet<Rc<Coord>> = HashSet::new();
         for cell in &board.cells {
-            if cell.val() == CellVal::None { continue; }
+            if cell.val() == CellVal::None {
+                continue;
+            }
             let pos = Rc::new(*cell.pos());
             clues.insert(pos);
         }
@@ -209,13 +211,13 @@ impl Solver {
             active: queue_to_hashmap(board.cells),
             clues: clues,
         }
-            /* we want to take ownership here
-            and convert the queue to a hashmap
-            so that interaction with the active board will be easier
-            and we can drop the Cell struct which deals with
-            the remaining values, which is not necessary for the solver.
-            comparing two of the same data structure is easier than
-            comparing two different ones */
+        /* we want to take ownership here
+        and convert the queue to a hashmap
+        so that interaction with the active board will be easier
+        and we can drop the Cell struct which deals with
+        the remaining values, which is not necessary for the solver.
+        comparing two of the same data structure is easier than
+        comparing two different ones */
     }
 
     /* very simple is_solved function compared to potentially having
@@ -225,7 +227,7 @@ impl Solver {
         self.solved == self.active
     }
 
-    pub fn fill_cell(&mut self, row: usize, col: usize, val: usize) -> Result<(), Error>{
+    pub fn fill_cell(&mut self, row: usize, col: usize, val: usize) -> Result<(), Error> {
         let pos = Coord::new(row, col);
         let coord: Rc<Coord>;
         match pos {
@@ -236,12 +238,11 @@ impl Solver {
         if self.clues.contains(&coord) {
             return Err(Error::overwrite_error());
         }
-        
+
         let val: CellVal = CellVal::new(val);
         self.active.insert(coord, val);
         Ok(())
     }
-
 }
 
 impl fmt::Display for Solver {

@@ -25,12 +25,11 @@ impl fmt::Display for Error {
     }
 }
 
-
 ///////////////////////// CELL /////////////////////////////
 
 /**
 * each cell has a position described by a Coordinate struct,
-  a value described by a CellVal enumuration, and a list of 
+  a value described by a CellVal enumuration, and a list of
   remaining values to use in the backtracking algorithm
 */
 #[derive(Debug, Clone)]
@@ -59,7 +58,7 @@ impl Cell {
 
     pub fn remaining(&self) -> &Vec<CellVal> {
         &self.remaining
-    } 
+    }
 
     pub fn to_empty_cell(&mut self) {
         self.val = CellVal::None;

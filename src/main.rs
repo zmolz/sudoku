@@ -15,11 +15,7 @@ const DIFFICULTY_HARD: usize = 48;
 const DIFFICULTY_NORMAL: usize = 32;
 const DIFFICULTY_EASY: usize = 16;
 
-const DIFFICULTIES: &str = "
-[IMPOSSIBLE/I]
-[HARD/H],
-[NORMAL/N],
-[EASY/E]";
+const DIFFICULTIES: &str = "[IMPOSSIBLE/I],\n[HARD/H],\n[NORMAL/N],\n[EASY/E]";
 
 lazy_static! {
     static ref COORD_MATCH: Regex = Regex::new(r"^(\d)(, |,| )(\d)(, |,| )(\d)$").unwrap();
@@ -70,11 +66,14 @@ fn main() {
         println!("{}", solver);
 
         input.clear();
-        println!("enter a cell and val (1-9, 0 to clear) as following:\trow, col, val\n\t");
+        println!("enter a cell and val (1-9, 0 to clear) as following:\n\n\trow, col, val\n");
+
         io::stdin()
             .read_line(&mut input)
             .expect("error reading line");
+
         input = input.trim().to_string();
+        
         if let Some(cap) = COORD_MATCH.captures(&input) {
             row = cap[1].parse().unwrap();
             col = cap[3].parse().unwrap();
