@@ -72,22 +72,20 @@ impl Board {
         // base-case 2, no valid options, could be entered by backtracking call or a next cell call
         if options.is_empty() {
             /*
-               we will have "psuedo recursive-backtracking", where
-               the backtracking is not neccesarily going to pop a frame off the
-               stack as you might expect, but rather we will control backtracking by
-               popping an element off the cell deque to remove the cell from the board
-               and then making the next recursive call by calling fill_cells with
+               we will have "psuedo recursive-backtracking", where we will control backtracking 
+               by popping an element off the cell deque to remove the cell from 
+               the board and then making the next recursive call by calling fill_cells with
                the previous coord passed (which is just the coord of the last cell we just popped,
-               so theres no logic neccesary to evaluate what that coord will be.
+               so theres no logic neccesary to evaluate what that coord will be).
 
-               Downside is obviously that the algorithm will be less
-               memory efficient in terms of concurrent stack size,
-               but the upside is that the amount of total frames added will not
+               The upside is that the amount of total frames added will not
                change, and we do not need to worry about having recursive calls
                return values to the caller, but rather pass values to the next call.
                Which, ill admit, is not idiomatically the way
-               to recurse but nevertheless will be easier to code, and still
-               θ(n^2) in terms of time complexity. (with n = num rows | col)
+               to code a backtracking algorithm but nevertheless will be easier to code, and still
+               θ(n^2) in terms of time complexity. (with n = num rows | col), and the calls
+               are in tail position so (assuming rust has correct tail calls), the concurrent stack size
+               is as efficient as possible.
             */
 
             // remove the last cell from the queue
